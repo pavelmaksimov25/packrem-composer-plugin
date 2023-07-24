@@ -1,0 +1,52 @@
+{
+    "name": "pavelmaksimov25/spryker-feature-remover",
+    "description": "This tool helps a developer to remove spryker features in the semi-automatic way.",
+    "license": "MIT",
+    "type": "composer-plugin",
+    "authors": [
+        {
+            "name": "Pavlo Maksymov",
+            "email": "pavlo.maksymov@spryker.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "composer/composer": "^2.5"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.6",
+        "squizlabs/php_codesniffer": "^3.7",
+        "slevomat/coding-standard": "^8.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "SprykerSdk\\SprykerFeatureRemover\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SprykerSdkTests\\": "tests/",
+            "SprykerSdkTests\\Stub\\": "tests/Stub"
+        },
+        "exclude-from-classmap": ["/tests/__data"]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "stan": "phpstan analyze",
+        "linters": [
+            "@cs-fix",
+            "@cs-check",
+            "@stan"
+        ],
+        "tests": "vendor/bin/phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": false
+        }
+    }
+}
