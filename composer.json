@@ -1,6 +1,6 @@
 {
-    "name": "pavelmaksimov25/spryker-feature-remover",
-    "description": "This tool helps a developer to remove spryker features in the semi-automatic way.",
+    "name": "pavelmaksimov25/packrem-composer-plugin",
+    "description": "This composer plugin helps a developer to remove spryker features in the semi-automatic way.",
     "license": "MIT",
     "type": "composer-plugin",
     "authors": [
