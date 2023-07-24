@@ -12,3 +12,4 @@
 ###< squizlabs/php_codesniffer ###
 
 .idea/
+composer.lock
