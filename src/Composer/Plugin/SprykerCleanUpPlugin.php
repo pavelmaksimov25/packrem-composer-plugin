@@ -3,15 +3,15 @@
 namespace SprykerSdk\SprykerFeatureRemover\Composer\Plugin;
 
 use Composer\Composer;
+use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreCommandRunEvent;
 use SprykerSdk\SprykerFeatureRemover\Factory\PackRemFactory;
 use SprykerSdk\SprykerFeatureRemover\PackageRemover\PackageRemover;
-use SprykerSdk\SprykerFeatureRemover\PackageRemover\PackageRemoverFactory;
 use SprykerSdk\SprykerFeatureRemover\Validator\PackageValidator;
 
-class SprykerCleanUpPlugin implements PluginInterface
+class SprykerCleanUpPlugin implements PluginInterface, EventSubscriberInterface
 {
     public const ACCEPTED_COMMAND = 'remove';
 
