@@ -2,36 +2,45 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\Action;
 
+use SprykerSdk\SprykerFeatureRemover\Adapter\SymfonyProcessAdapter;
 use SprykerSdk\SprykerFeatureRemover\Dto\ActionDto;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
-class DataBuilderGenerator implements ActionInterface
+final class DataBuilderGenerator implements ActionInterface
 {
+    public const COMMAND = 'vendor/bin/console transfer:databuilder:generate';
     private const GENERATED_DATA_BUILDER_DIR = 'src/Generated/Shared/DataBuilder';
+
+    public function __construct(private Filesystem $filesystem, private SymfonyProcessAdapter $process)
+    {
+    }
 
     public function act(ActionDto $actionDto): void
     {
-        $this->removeGeneratedFiles();
-        $this->generateFiles();
-    }
-
-    private function removeGeneratedFiles(): void
-    {
-        echo 'Removing ' . self::GENERATED_DATA_BUILDER_DIR;
-        $result = shell_exec('rm -rf ' . self::GENERATED_DATA_BUILDER_DIR);
-        echo $result . PHP_EOL;
-    }
-
-    private function generateFiles(): void
-    {
-        echo 'Going to execute vendor/bin/console transfer:databuilder:generate' . PHP_EOL;
-        $result = shell_exec('vendor/bin/console transfer:databuilder:generate');
-        if (!$result) {
-            echo 'DataBuilder re-generation failed. Please run manually: ' . PHP_EOL;
-            echo 'vendor/bin/console transfer:databuilder:generate' . PHP_EOL;
-
+        $this->removeGeneratedFiles($actionDto);
+        if (!$actionDto->isOk()) {
             return;
         }
 
-        echo $result . PHP_EOL;
+        $this->generateFiles($actionDto);
+    }
+
+    private function removeGeneratedFiles(ActionDto $actionDto): void
+    {
+        try {
+            $this->filesystem->remove(self::GENERATED_DATA_BUILDER_DIR);
+        } catch (IOException $exception) {
+            $actionDto->addErrorMessage($exception->getMessage());
+        }
+    }
+
+    private function generateFiles(ActionDto $actionDto): void
+    {
+        $result = $this->process->run(self::COMMAND);
+        if (!$result->isOk()) {
+            $actionDto->addErrorMessage('`' . self::COMMAND . '` command execution failed. Please run manually.');
+            $actionDto->addErrorMessage($result->getErrorOutput());
+        }
     }
 }

@@ -59,4 +59,9 @@ class ActionDto
     {
         $this->errorMessages[] = $errorMessage;
     }
+
+    public function isOk(): bool
+    {
+        return count($this->errorMessages) === 0;
+    }
 }
