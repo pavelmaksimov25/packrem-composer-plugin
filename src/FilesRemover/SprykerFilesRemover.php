@@ -2,10 +2,10 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\FilesRemover;
 
-use _PHPStan_d55c4f2c2\Nette\IOException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class SprykerFilesRemover
+class SprykerFilesRemover
 {
     public const APP_LAYERS = [
         'Client',
@@ -20,7 +20,7 @@ final class SprykerFilesRemover
     {
     }
 
-    public function removeModuleDirectoryFromProjectSrc(string $moduleName): bool
+    public function removeModuleDirectoryFromProject(string $moduleName): bool
     {
         $pathList = [];
         foreach (self::APP_LAYERS as $appLayer) {
@@ -35,7 +35,7 @@ final class SprykerFilesRemover
         return true;
     }
 
-    public function removeModuleDirectoryFromProjectOrm(string $moduleName): bool
+    public function removeModuleDirectoryFromOrm(string $moduleName): bool
     {
         $path = 'src/Orm/Zed/' . $moduleName;
 

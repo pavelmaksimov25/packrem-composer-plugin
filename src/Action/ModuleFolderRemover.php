@@ -12,7 +12,7 @@ namespace SprykerSdk\SprykerFeatureRemover\Action;
 use SprykerSdk\SprykerFeatureRemover\Dto\ActionDto;
 use SprykerSdk\SprykerFeatureRemover\FilesRemover\SprykerFilesRemover;
 
-class ModuleFolderRemover implements ActionInterface
+final class ModuleFolderRemover implements ActionInterface
 {
     public function __construct(private SprykerFilesRemover $sprykerFilesRemover)
     {
@@ -21,17 +21,17 @@ class ModuleFolderRemover implements ActionInterface
     /**
      * @return void
      */
-    public function act(ActionDto $actionDto): void
+    final public function act(ActionDto $actionDto): void
     {
         foreach ($actionDto->getModuleNames() as $moduleName) {
-            $result = $this->sprykerFilesRemover->removeModuleDirectoryFromProjectSrc($moduleName);
+            $result = $this->sprykerFilesRemover->removeModuleDirectoryFromProject($moduleName);
             if (!$result) {
-                $actionDto->addErrorMessage('Could not delete folders for the module ' . $moduleName);
+                $actionDto->addErrorMessage('Could not delete folders from project for the module ' . $moduleName);
             }
 
-            $result = $this->sprykerFilesRemover->removeModuleDirectoryFromProjectOrm($moduleName);
+            $result = $this->sprykerFilesRemover->removeModuleDirectoryFromOrm($moduleName);
             if (!$result) {
-                $actionDto->addErrorMessage('Could not delete folders for the module ' . $moduleName);
+                $actionDto->addErrorMessage('Could not delete folders from `Orm` folder for the module ' . $moduleName);
             }
         }
     }

@@ -8,6 +8,7 @@ use SprykerSdk\SprykerFeatureRemover\Action\DataBuilderGenerator;
 use SprykerSdk\SprykerFeatureRemover\Action\ModuleFolderRemover;
 use SprykerSdk\SprykerFeatureRemover\Action\TransferGenerator;
 use SprykerSdk\SprykerFeatureRemover\Adapter\ComposerAdapter;
+use SprykerSdk\SprykerFeatureRemover\Adapter\SymfonyProcessAdapter;
 use SprykerSdk\SprykerFeatureRemover\Config\Config;
 use SprykerSdk\SprykerFeatureRemover\Extractor\PackageExtractor;
 use SprykerSdk\SprykerFeatureRemover\FilesRemover\SprykerFilesRemover;
@@ -46,12 +47,18 @@ final class PackRemFactory
 
     final public function createTransferGeneratorAction(): ActionInterface
     {
-        return new TransferGenerator();
+        return new TransferGenerator(
+            new Filesystem(),
+            new SymfonyProcessAdapter()
+        );
     }
 
     final public function createDataBuilderGenerator(): ActionInterface
     {
-        return new DataBuilderGenerator();
+        return new DataBuilderGenerator(
+            new Filesystem(),
+            new SymfonyProcessAdapter()
+        );
     }
 
     final public function createSprykerModuleResolver(): SprykerModuleResolver

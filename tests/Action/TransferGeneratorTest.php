@@ -2,15 +2,15 @@
 
 namespace SprykerSdkTests\Action;
 
+use SprykerSdk\SprykerFeatureRemover\Action\TransferGenerator;
 use PHPUnit\Framework\TestCase;
-use SprykerSdk\SprykerFeatureRemover\Action\DataBuilderGenerator;
 use SprykerSdk\SprykerFeatureRemover\Adapter\SymfonyProcessAdapter;
 use SprykerSdk\SprykerFeatureRemover\Dto\ActionDto;
 use SprykerSdk\SprykerFeatureRemover\Dto\ProcessResult;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-class DataBuilderGeneratorTest extends TestCase
+class TransferGeneratorTest extends TestCase
 {
     public function testActSuccess(): void
     {
@@ -21,10 +21,10 @@ class DataBuilderGeneratorTest extends TestCase
         $processAdapterMock = $this->createMock(SymfonyProcessAdapter::class);
         $processAdapterMock->expects($this->once())
             ->method('run')
-            ->with(DataBuilderGenerator::COMMAND)
+            ->with(TransferGenerator::COMMAND)
             ->willReturn(new ProcessResult(''));
 
-        $dataBuilderGenerator = new DataBuilderGenerator($filesystemMock, $processAdapterMock);
+        $dataBuilderGenerator = new TransferGenerator($filesystemMock, $processAdapterMock);
 
         $actionDto = new ActionDto();
         $dataBuilderGenerator->act($actionDto);
@@ -44,7 +44,7 @@ class DataBuilderGeneratorTest extends TestCase
         $processAdapterMock->expects($this->never())
             ->method('run');
 
-        $dataBuilderGenerator = new DataBuilderGenerator($filesystemMock, $processAdapterMock);
+        $dataBuilderGenerator = new TransferGenerator($filesystemMock, $processAdapterMock);
 
         $actionDto = new ActionDto();
         $dataBuilderGenerator->act($actionDto);
@@ -63,20 +63,19 @@ class DataBuilderGeneratorTest extends TestCase
         $processAdapterMock = $this->createMock(SymfonyProcessAdapter::class);
         $processAdapterMock->expects($this->once())
             ->method('run')
-            ->with(DataBuilderGenerator::COMMAND)
+            ->with(TransferGenerator::COMMAND)
             ->willReturn(new ProcessResult('Unable to execute command.', false));
 
-        $dataBuilderGenerator = new DataBuilderGenerator($filesystemMock, $processAdapterMock);
+        $dataBuilderGenerator = new TransferGenerator($filesystemMock, $processAdapterMock);
 
         $actionDto = new ActionDto();
         $dataBuilderGenerator->act($actionDto);
 
         $this->assertFalse($actionDto->isOk());
-        $this->assertCount(2, $actionDto->getErrorMessages());
+        $this->assertCount(1, $actionDto->getErrorMessages());
         $this->assertContains(
-            '`' . DataBuilderGenerator::COMMAND . '` command execution failed. Please run manually.',
+            'Unable to execute command.',
             $actionDto->getErrorMessages(),
         );
-        $this->assertContains('Unable to execute command.', $actionDto->getErrorMessages());
     }
 }

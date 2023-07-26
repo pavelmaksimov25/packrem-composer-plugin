@@ -16,7 +16,7 @@ final class DataBuilderGenerator implements ActionInterface
     {
     }
 
-    public function act(ActionDto $actionDto): void
+    final public function act(ActionDto $actionDto): void
     {
         $this->removeGeneratedFiles($actionDto);
         if (!$actionDto->isOk()) {

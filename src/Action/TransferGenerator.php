@@ -2,36 +2,44 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\Action;
 
+use SprykerSdk\SprykerFeatureRemover\Adapter\SymfonyProcessAdapter;
 use SprykerSdk\SprykerFeatureRemover\Dto\ActionDto;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class TransferGenerator implements ActionInterface
 {
+    public const COMMAND = 'vendor/bin/console transfer:generate';
     private const GENERATED_TRANSFER_DIR = 'src/Generated/Shared/Transfer';
+
+    public function __construct(private Filesystem $filesystem, private SymfonyProcessAdapter $process)
+    {
+    }
 
     public function act(ActionDto $actionDto): void
     {
-        $this->removeGeneratedTransfers();
-        $this->generateTransfers();
-    }
-
-    private function removeGeneratedTransfers(): void
-    {
-        echo 'Removing ' . self::GENERATED_TRANSFER_DIR;
-        $result = shell_exec('rm -rf ' . self::GENERATED_TRANSFER_DIR);
-        echo $result . PHP_EOL;
-    }
-
-    private function generateTransfers(): void
-    {
-        echo 'Going to execute vendor/bin/console transfer:generate' . PHP_EOL;
-        $result = shell_exec('vendor/bin/console transfer:generate');
-        if (!$result) {
-            echo 'Transfer re-generation failed. Please run manually: ' . PHP_EOL;
-            echo 'vendor/bin/console transfer:generate' . PHP_EOL;
-
+        $this->removeGeneratedTransfers($actionDto);
+        if (!$actionDto->isOk()) {
             return;
         }
 
-        echo $result . PHP_EOL;
+        $this->generateTransfers($actionDto);
+    }
+
+    private function removeGeneratedTransfers(ActionDto $actionDto): void
+    {
+        try {
+            $this->filesystem->remove(self::GENERATED_TRANSFER_DIR);
+        } catch (IOException $exception) {
+            $actionDto->addErrorMessage($exception->getMessage());
+        }
+    }
+
+    private function generateTransfers(ActionDto $actionDto): void
+    {
+        $resultDto = $this->process->run(self::COMMAND);
+        if (!$resultDto->isOk()) {
+            $actionDto->addErrorMessage($resultDto->getErrorOutput());
+        }
     }
 }
