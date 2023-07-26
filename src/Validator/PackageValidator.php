@@ -11,24 +11,25 @@ namespace SprykerSdk\SprykerFeatureRemover\Validator;
 
 use Composer\InstalledVersions;
 use SprykerSdk\SprykerFeatureRemover\Dto\PackageInputValidationResult;
+use SprykerSdk\SprykerFeatureRemover\Dto\PackageRemoveDto;
 
 class PackageValidator
 {
-    public function isValidListOfPackages(array $packageList): PackageInputValidationResult
+    public function isValidListOfPackages(PackageRemoveDto $packageRemoveDto): PackageInputValidationResult
     {
         $result = new PackageInputValidationResult();
 
-        foreach ($packageList as $package) {
-            if (!$this->isSprykerPackage($package)) {
+        foreach ($packageRemoveDto->getPackageNames() as $packageName) {
+            if (!$this->isSprykerPackage($packageName)) {
                 $result->setIsOk(false);
-                $result->setMessage("$package is not spryker package.");
+                $result->setMessage("$packageName is not spryker package.");
 
                 return $result;
             }
 
-            if (!$this->isPackageInstalled($package)) {
+            if (!$this->isPackageInstalled($packageName)) { // todo :: remove uninstalled files from the PackageRemoveDto. shouldn't be in the validator
                 $result->setIsOk(false);
-                $result->setMessage("$package is not installed.");
+                $result->setMessage("$packageName is not installed.");
 
                 return $result;
             }

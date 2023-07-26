@@ -11,9 +11,10 @@ namespace SprykerSdk\SprykerFeatureRemover\PackageRemover;
 
 use SprykerSdk\SprykerFeatureRemover\Action\ActionInterface;
 use SprykerSdk\SprykerFeatureRemover\Dto\ActionDto;
+use SprykerSdk\SprykerFeatureRemover\Dto\PackageRemoveDto;
 use SprykerSdk\SprykerFeatureRemover\Dto\PackageRemoveResult;
 
-class PackageRemover
+final class PackageRemover
 {
     /**
      * @param iterable<ActionInterface> $actions
@@ -23,31 +24,23 @@ class PackageRemover
     }
 
     /**
-     * @param $packages array<string>
+     * @param PackageRemoveDto $packageRemoveDto
      *
-     * @return mixed ResponseDto
-     * @todo use dto
-     *
+     * @return PackageRemoveResult
      */
-    public function removePackages(array $packages): PackageRemoveResult
+    public function removePackages(PackageRemoveDto $packageRemoveDto): PackageRemoveResult
     {
         $packageRemoveResult = new PackageRemoveResult();
 
-        // package remove
-        // todo :: refactor to action per packages
-        foreach ($packages as $package) {
-            $actionDto = new ActionDto();
-            $actionDto->setModuleName($package);
-            foreach ($this->actions as $action) {
-                $action->act($actionDto);
-            }
-            if (count($actionDto->getErrorMessages()) > 0) {
-                $packageRemoveResult->setIsOk(false);
-                $packageRemoveResult->addMessages($actionDto->getErrorMessages());
-            }
+        // todo :: make list of spryker modules and pass to the actions
 
-            /* package post-remove hook
-             * Removes:
+        $actionDto = new ActionDto();
+        $actionDto->setModuleNames($packageRemoveDto->getPackageNames());
+        foreach ($this->actions as $action) {
+            $action->act($actionDto);
+            /*
+             * todo(remove/update):
+             *  - related configuration
              *  - related plugins.
              *  - related configs.
              *      - cron jobs
@@ -55,12 +48,14 @@ class PackageRemover
              *      - state machine
              *      - data?
              *  - related tests.
-             *  - related folders on the project level.
-             *  - related generated data.
-             *  - related ORM data. Remove from src/Orm/*
              */
         }
 
-        return new PackageRemoveResult();
+        if (count($actionDto->getErrorMessages()) > 0) {
+            $packageRemoveResult->setIsOk(false);
+            $packageRemoveResult->addMessages($actionDto->getErrorMessages());
+        }
+
+        return $packageRemoveResult;
     }
 }

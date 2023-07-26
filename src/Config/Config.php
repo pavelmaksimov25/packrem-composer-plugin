@@ -4,13 +4,19 @@ namespace SprykerSdk\SprykerFeatureRemover\Config;
 
 final class Config
 {
-    public const PROJECT_NAMESPACE = 'PROJECT_NAMESPACE';
+    public const KEY_PROJECT_NAMESPACE = 'project_namespace';
 
-    final public function getProjectNamespace(): string
+    public const PROJECT_NAMESPACE_DEFAULT = 'Pyz';
+
+    public function __construct(private string $projectNamespace)
     {
+    }
 
-        $projectNamespace = (string)getenv(self::PROJECT_NAMESPACE);
-
-        return $projectNamespace ?: 'Pyz';
+    /**
+     * @return string
+     */
+    public function getProjectNamespace(): string
+    {
+        return $this->projectNamespace ?? self::PROJECT_NAMESPACE_DEFAULT;
     }
 }

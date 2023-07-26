@@ -2,17 +2,25 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\Factory;
 
+use Composer\Composer;
 use SprykerSdk\SprykerFeatureRemover\Action\ActionInterface;
 use SprykerSdk\SprykerFeatureRemover\Action\DataBuilderGenerator;
 use SprykerSdk\SprykerFeatureRemover\Action\ModuleFolderRemover;
 use SprykerSdk\SprykerFeatureRemover\Action\TransferGenerator;
-use SprykerSdk\SprykerFeatureRemover\Adapter\RmModuleDirAdapter;
+use SprykerSdk\SprykerFeatureRemover\Adapter\ComposerAdapter;
 use SprykerSdk\SprykerFeatureRemover\Config\Config;
+use SprykerSdk\SprykerFeatureRemover\Extractor\PackageExtractor;
+use SprykerSdk\SprykerFeatureRemover\FilesRemover\SprykerFilesRemover;
 use SprykerSdk\SprykerFeatureRemover\PackageRemover\PackageRemover;
+use SprykerSdk\SprykerFeatureRemover\Resolver\SprykerModuleResolver;
+use SprykerSdk\SprykerFeatureRemover\Validator\PackageValidator;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class PackRemFactory
 {
-    public final function createPackageRemover(): PackageRemover
+    public function __construct(private Config $config) {}
+
+    final public function createPackageRemover(): PackageRemover
     {
         return new PackageRemover([
             $this->createModuleFolderRemoverAction(),
@@ -21,23 +29,45 @@ final class PackRemFactory
         ]);
     }
 
-    public final function createModuleFolderRemoverAction(): ActionInterface
+    final public function createModuleFolderRemoverAction(): ActionInterface
     {
         return new ModuleFolderRemover($this->createRmDirAdapter());
     }
 
-    public final function createRmDirAdapter(): RmModuleDirAdapter
+    final public function createRmDirAdapter(): SprykerFilesRemover
     {
-        return new RmModuleDirAdapter((new Config())->getProjectNamespace());
+        return new SprykerFilesRemover($this->config->getProjectNamespace(), $this->createFilesystem());
     }
 
-    public final function createTransferGeneratorAction(): ActionInterface
+    private function createFilesystem(): Filesystem
+    {
+        return new Filesystem();
+    }
+
+    final public function createTransferGeneratorAction(): ActionInterface
     {
         return new TransferGenerator();
     }
 
-    public final function createDataBuilderGenerator(): ActionInterface
+    final public function createDataBuilderGenerator(): ActionInterface
     {
         return new DataBuilderGenerator();
+    }
+
+    final public function createSprykerModuleResolver(): SprykerModuleResolver
+    {
+        return new SprykerModuleResolver(
+            new ComposerAdapter(),
+        );
+    }
+
+    final public function createPackageExtractor(): PackageExtractor
+    {
+        return new PackageExtractor();
+    }
+
+    final public function createPackageValidator(): PackageValidator
+    {
+        return new PackageValidator();
     }
 }

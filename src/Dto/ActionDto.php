@@ -11,28 +11,41 @@ namespace SprykerSdk\SprykerFeatureRemover\Dto;
 
 class ActionDto
 {
-    private string $moduleName = '';
+    /**
+     * @var array<string>
+     */
+    private array $moduleNames = [];
 
     /**
      * @var array<string>
      */
     private array $errorMessages = [];
 
-    public function getModuleName(): string
+    /**
+     * @return array<string>
+     */
+    public function getModuleNames(): array
     {
-        return $this->moduleName;
+        return array_unique($this->moduleNames);
     }
 
     /**
+     * @param array<string> $moduleNames
+     *
      * @return void
      */
-    public function setModuleName(string $moduleName): void
+    public function setModuleNames(array $moduleNames): void
     {
-        $this->moduleName = $moduleName;
+        $this->moduleNames = $moduleNames;
+    }
+
+    public function addModuleName(string $moduleName): void
+    {
+        $this->moduleNames[] = $moduleName;
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getErrorMessages(): array
     {
