@@ -46,6 +46,7 @@ final class Application
 
         $packageRemoveDto = new PackageRemoveDto();
         $packageRemoveDto->setPackages($packages);
+
         $validationResultDto = $this->factory
             ->createPackageValidator()
             ->isValidListOfPackages($packageRemoveDto);

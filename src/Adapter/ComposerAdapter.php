@@ -9,18 +9,24 @@ declare(strict_types=1);
 
 namespace SprykerSdk\SprykerFeatureRemover\Adapter;
 
-use Composer\Composer;
+use Composer\InstalledVersions;
+use Composer\Package\PackageInterface;
 
 class ComposerAdapter
 {
     /**
-     * @param string $packageName
+     * @param PackageInterface $package
      *
-     * @return array<string>
+     * @return array
      */
-    public function getListOfPackageDependencies(string $packageName): array
+    public function getListOfPackageDependencies(PackageInterface $package): array
     {
+        $packages = array_merge(
+            array_keys($package->getRequires()),
+            array_keys($package->getDevRequires()),
+        );
 
+        return $this->filterSprykerPackagesOnly($packages);
     }
 
     /**
@@ -28,11 +34,16 @@ class ComposerAdapter
      *
      * @return array<string>
      */
-    public function sprykerPackagesOnly(array $packages): array
+    private function filterSprykerPackagesOnly(array $packages): array
     {
         return array_filter(
             $packages,
             fn($packageName): bool => str_contains($packageName, 'spryker'),
         );
+    }
+
+    public function isPackageInstalled(string $packageName): bool
+    {
+        return InstalledVersions::isInstalled($packageName);
     }
 }

@@ -32,22 +32,16 @@ final class PackageRemover
     {
         $packageRemoveResult = new PackageRemoveResult();
 
-        // todo :: make list of spryker modules and pass to the actions
-
         $actionDto = new ActionDto();
-        $actionDto->setModuleNames($packageRemoveDto->getPackageNames());
+        $actionDto->setModuleNames($packageRemoveDto->getModuleNames());
         foreach ($this->actions as $action) {
             $action->act($actionDto);
             /*
              * todo(remove/update):
-             *  - related configuration
              *  - related plugins.
              *  - related configs.
-             *      - cron jobs
-             *      - oms
-             *      - state machine
-             *      - data?
              *  - related tests.
+             *  - related business model highlight.
              */
         }
 

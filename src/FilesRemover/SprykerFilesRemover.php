@@ -2,32 +2,20 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\FilesRemover;
 
+use SprykerSdk\SprykerFeatureRemover\Helper\SprykerPath;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class SprykerFilesRemover
 {
-    public const APP_LAYERS = [
-        'Client',
-        'Glue',
-        'Service',
-        'Shared',
-        'Yves',
-        'Zed',
-    ];
-
-    public function __construct(private string $projectNamespace, private Filesystem $filesystem)
+    public function __construct(private SprykerPath $sprykerPath, private Filesystem $filesystem)
     {
     }
 
     public function removeModuleDirectoryFromProject(string $moduleName): bool
     {
-        $pathList = [];
-        foreach (self::APP_LAYERS as $appLayer) {
-            $pathList[] = "src/$this->projectNamespace/$appLayer/$moduleName";
-        }
         try {
-            $this->filesystem->remove($pathList);
+            $this->filesystem->remove($this->sprykerPath->getModulePaths($moduleName));
         } catch (IOException $exception) {
             return false;
         }
@@ -37,10 +25,8 @@ class SprykerFilesRemover
 
     public function removeModuleDirectoryFromOrm(string $moduleName): bool
     {
-        $path = 'src/Orm/Zed/' . $moduleName;
-
         try {
-            $this->filesystem->remove($path);
+            $this->filesystem->remove($this->sprykerPath->getOrmPathForModule($moduleName));
         } catch (IOException $exception) {
             return false;
         }

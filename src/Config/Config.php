@@ -8,6 +8,15 @@ final class Config
 
     public const PROJECT_NAMESPACE_DEFAULT = 'Pyz';
 
+    public const APP_LAYERS = [
+        'Client',
+        'Glue',
+        'Service',
+        'Shared',
+        'Yves',
+        'Zed',
+    ];
+
     public function __construct(private string $projectNamespace)
     {
     }
@@ -17,6 +26,6 @@ final class Config
      */
     public function getProjectNamespace(): string
     {
-        return $this->projectNamespace ?? self::PROJECT_NAMESPACE_DEFAULT;
+        return $this->projectNamespace ?: self::PROJECT_NAMESPACE_DEFAULT;
     }
 }

@@ -1,20 +1,20 @@
 <?php
 
-/**
- * Copyright © 2016-present Spryker Systems GmbH. All rights reserved.
- * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- */
-
 declare(strict_types=1);
 
 namespace SprykerSdk\SprykerFeatureRemover\Validator;
 
 use Composer\InstalledVersions;
+use SprykerSdk\SprykerFeatureRemover\Adapter\ComposerAdapter;
 use SprykerSdk\SprykerFeatureRemover\Dto\PackageInputValidationResult;
 use SprykerSdk\SprykerFeatureRemover\Dto\PackageRemoveDto;
 
 class PackageValidator
 {
+    public function __construct(private ComposerAdapter $composerAdapter)
+    {
+    }
+
     public function isValidListOfPackages(PackageRemoveDto $packageRemoveDto): PackageInputValidationResult
     {
         $result = new PackageInputValidationResult();
@@ -27,7 +27,7 @@ class PackageValidator
                 return $result;
             }
 
-            if (!$this->isPackageInstalled($packageName)) { // todo :: remove uninstalled files from the PackageRemoveDto. shouldn't be in the validator
+            if (!$this->isPackageInstalled($packageName)) {
                 $result->setIsOk(false);
                 $result->setMessage("$packageName is not installed.");
 
@@ -45,6 +45,6 @@ class PackageValidator
 
     private function isPackageInstalled(string $packageName): bool
     {
-        return InstalledVersions::isInstalled($packageName);
+        return $this->composerAdapter->isPackageInstalled($packageName);
     }
 }

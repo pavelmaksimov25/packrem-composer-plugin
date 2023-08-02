@@ -47,14 +47,17 @@ class SprykerCleanUpPlugin implements PluginInterface, EventSubscriberInterface
         $this->composer = $composer;
         $this->io = $io;
 
-        $value = (string)$this->io->ask('Please set project namespace. Deafult is `Pyz`.');
-        if (!$value) {
-            $this->io->warning('The incorrect value has been provided. The default one(`Pyz`) will be set.');
-            $this->io->warning('Please, set proper namespace to the `extra` section in the composer.json so `PackRem` works properly.');
-        }
+        // todo :: load only once
+        //   currently it asks each time on each command.
+        // todo :: Load project namespace from the projects default config.
+//        $value = (string)$this->io->ask('Please set project namespace. Default is `Pyz`.');
+//        if (!$value) {
+//            $this->io->warning('The incorrect value has been provided. The default one(`Pyz`) will be set.');
+//            $this->io->warning('Please, set proper namespace to the `extra` section in the composer.json so `PackRem` works properly.');
+//        }
 
         $extra = $this->composer->getPackage()->getExtra();
-        $extra[Config::KEY_PROJECT_NAMESPACE] = $value;
+        $extra[Config::KEY_PROJECT_NAMESPACE] = 'Pyz'; // stub
         $this->composer->getPackage()->setExtra($extra);
     }
 
@@ -71,7 +74,9 @@ class SprykerCleanUpPlugin implements PluginInterface, EventSubscriberInterface
         $result = $application->run($event);
 
         if (!$result->isOk()) {
-            $this->io->error($result->getMessage());
+            foreach ($result->getMessages() as $message) {
+                $this->io->error($message);
+            }
         }
     }
 
@@ -81,9 +86,5 @@ class SprykerCleanUpPlugin implements PluginInterface, EventSubscriberInterface
 
     public function uninstall(Composer $composer, IOInterface $io)
     {
-        // expected that project namespace value will be removed from the composer.json
-        $extra = $this->composer->getPackage()->getExtra();
-        unset($extra[Config::KEY_PROJECT_NAMESPACE]);
-        $this->composer->getPackage()->setExtra($extra);
     }
 }

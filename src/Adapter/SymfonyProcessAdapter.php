@@ -13,7 +13,7 @@ class SymfonyProcessAdapter
         $process->run();
 
         return new ProcessResult(
-            $process->getErrorOutput(),
+            trim($process->getErrorOutput()),
             $process->isSuccessful(),
         );
     }

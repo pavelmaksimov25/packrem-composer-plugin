@@ -2,7 +2,6 @@
 
 namespace SprykerSdk\SprykerFeatureRemover\Factory;
 
-use Composer\Composer;
 use SprykerSdk\SprykerFeatureRemover\Action\ActionInterface;
 use SprykerSdk\SprykerFeatureRemover\Action\DataBuilderGenerator;
 use SprykerSdk\SprykerFeatureRemover\Action\ModuleFolderRemover;
@@ -12,6 +11,7 @@ use SprykerSdk\SprykerFeatureRemover\Adapter\SymfonyProcessAdapter;
 use SprykerSdk\SprykerFeatureRemover\Config\Config;
 use SprykerSdk\SprykerFeatureRemover\Extractor\PackageExtractor;
 use SprykerSdk\SprykerFeatureRemover\FilesRemover\SprykerFilesRemover;
+use SprykerSdk\SprykerFeatureRemover\Helper\SprykerPath;
 use SprykerSdk\SprykerFeatureRemover\PackageRemover\PackageRemover;
 use SprykerSdk\SprykerFeatureRemover\Resolver\SprykerModuleResolver;
 use SprykerSdk\SprykerFeatureRemover\Validator\PackageValidator;
@@ -37,7 +37,7 @@ final class PackRemFactory
 
     final public function createRmDirAdapter(): SprykerFilesRemover
     {
-        return new SprykerFilesRemover($this->config->getProjectNamespace(), $this->createFilesystem());
+        return new SprykerFilesRemover($this->createSprykerPathHelper(), $this->createFilesystem());
     }
 
     private function createFilesystem(): Filesystem
@@ -75,6 +75,11 @@ final class PackRemFactory
 
     final public function createPackageValidator(): PackageValidator
     {
-        return new PackageValidator();
+        return new PackageValidator(new ComposerAdapter());
+    }
+
+    final public function createSprykerPathHelper(): SprykerPath
+    {
+        return new SprykerPath($this->config->getProjectNamespace());
     }
 }

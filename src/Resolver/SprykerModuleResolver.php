@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace SprykerSdk\SprykerFeatureRemover\Resolver;
 
+use Composer\Package\PackageInterface;
 use SprykerSdk\SprykerFeatureRemover\Adapter\ComposerAdapter;
 use SprykerSdk\SprykerFeatureRemover\Dto\PackageRemoveDto;
 
@@ -26,8 +27,8 @@ class SprykerModuleResolver
     public function expandWithFeatureModuleNames(PackageRemoveDto $packageRemoveDto): void
     {
         $modulesNames = [];
-        foreach ($packageRemoveDto->getPackageNames() as $packageName) {
-            $modulesNames[] = $this->resolveModulesNamesForSinglePackage($packageName);
+        foreach ($packageRemoveDto->getPackages() as $package) {
+            $modulesNames[] = $this->resolveModulesNamesForSinglePackage($package);
         }
 
         $modulesNames = array_merge([], ...$modulesNames);
@@ -36,24 +37,23 @@ class SprykerModuleResolver
     }
 
     /**
-     * @param string $packageName
+     * @param PackageInterface $package
      *
      * @return array<string>
      */
-    private function resolveModulesNamesForSinglePackage(string $packageName): array
+    private function resolveModulesNamesForSinglePackage(PackageInterface $package): array
     {
-        $dependencies = [];
-        $packages = $this->composerAdapter->getListOfPackageDependencies($packageName);
-        $packages = $this->composerAdapter->sprykerPackagesOnly($packages);
-        foreach ($packages as $package) {
-            if ($this->isFeaturePackage($package)) {
+        $modules = [];
+        $dependencies = $this->composerAdapter->getListOfPackageDependencies($package);
+        foreach ($dependencies as $dependency) {
+            if ($this->isFeaturePackage($dependency)) {
                 continue;
             }
 
-            $dependencies[] = $this->resolveRegularModuleNameByPackageName($package);
+            $modules[] = $this->resolveRegularModuleNameByPackageName($dependency);
         }
 
-        return $dependencies;
+        return $modules;
     }
 
     private function isFeaturePackage(string $packageName): bool
